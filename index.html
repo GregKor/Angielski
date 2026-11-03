@@ -85,7 +85,10 @@ function tx(){if(!txm)return`<p class="mute">Wklej lub wpisz angielski tekst. Po
 const k=new Set(WL.map(w=>w.e.toLowerCase()));
 const h=S.txt.split(/([A-Za-z][A-Za-z'’-]*)/).map((p,i)=>i%2?`<span class="tw ${k.has(p.toLowerCase())?'k':''} ${sel==p?'s':''}" onclick="pw(this.textContent)">${p}</span>`:esc(p)).join('');
 const pan=sel?`<div class="card" style="position:sticky;bottom:8px;box-shadow:0 6px 24px rgba(0,0,0,.25)"><b class="big">${esc(sel)}</b> <button class="b" onclick="say(sel)">🔊</button><input id="sp" placeholder="Tłumaczenie po polsku" value="${esc(trv)}"><div class="row"><button class="b" onclick="tr()">🤖 Tłumacz</button><button class="b p" onclick="addw()">＋ Do słownika</button></div></div>`:'';
-return`<div class="row"><button class="b" onclick="txm=false;go()">✏️ Edytuj tekst</button></div><div style="line-height:2;white-space:pre-wrap">${h}</div>${pan}`}
+return`<div class="row"><button class="b p" onclick="readAll()">▶️ Czytaj na głos</button><button class="b" onclick="stopAll()">⏹ Stop</button></div><div class="row"><select onchange="rt=+this.value" aria-label="Tempo">${[[.7,'Wolno'],[.9,'Normalnie'],[1.1,'Szybko']].map(x=>`<option value="${x[0]}" ${x[0]==rt?'selected':''}>Tempo: ${x[1]}</option>`).join('')}</select><button class="b" onclick="stopAll();txm=false;go()">✏️ Edytuj tekst</button></div><div style="line-height:2;white-space:pre-wrap">${h}</div>${pan}`}
+let rt=.9;
+function readAll(){try{speechSynthesis.cancel();const ch=S.txt.match(/[^.!?\n]+[.!?]*/g)||[];if(!ch.length)return note('Najpierw wklej tekst.');ch.forEach(t=>{t=t.trim();if(!t)return;const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rt;speechSynthesis.speak(u)})}catch(e){note('Ta przeglądarka nie obsługuje czytania na głos.')}}
+function stopAll(){try{speechSynthesis.cancel()}catch(e){}}
 function pw(w){sel=w;trv='';say(w);go();if(S.ai.key)tr()}
 async function tr(){const w=sel;try{trv=(await aic('Translate the English word to Polish in the context of the text. Answer with 1-3 Polish equivalents only.',[{role:'user',content:'Word: '+w+'\nText: '+S.txt.slice(0,600)}])).trim()}catch(e){nt=e.message}if(sel==w)go()}
 function addw(){const p=($('#sp').value||'').trim();if(!p)return note('Wpisz tłumaczenie lub użyj AI.');addTopic('Moje słówka',[[sel.toLowerCase(),p]]);sel=null;trv='';go()}
