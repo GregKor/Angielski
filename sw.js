@@ -1,4 +1,4 @@
-const V = 'my-english-v2-0';
+const V = 'my-english-v3-3';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
